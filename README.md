@@ -19,4 +19,4 @@ The Keras model is stored in the [model](https://github.com/parth58/Speaker_Reco
 * Parth A. Patel (CE - 093)
 * Yug D. Rajani (CE - 109)
 * Darsh N. Shah (CE - 119)
-* Batch: D2
+
