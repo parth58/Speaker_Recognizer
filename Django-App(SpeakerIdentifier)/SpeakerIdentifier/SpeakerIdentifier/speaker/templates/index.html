@@ -1,0 +1,66 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Speaker Recognizer</title>
+ <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  
+  <link href="https://fonts.googleapis.com/css?family=Josefin+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+
+ <main>
+  <section class="left-sec">
+      <div class="text-center">
+            <h1><a class="heading" href="/index/">Speaker Recognizer to identify who is speaking</a></h1>
+        </div>
+        <div class="container" id="Container1">
+          <div class="row">
+            <div class="col-sm-4 text-center" id="FileUpload">
+              <a href="{% url 'upload_file' %}" class="btnx ">Upload audio file</a>
+            </div>
+            <div class="col-sm-4 text-center" id="FileDelete">
+              <a href="{% url 'file_delete' %}" class="btnx ">Delete a file from the server</a>
+            </div>
+            <div class="col-sm-4 text-center" id="makePredictions">
+              <a href="{% url 'file_select' %}" class="btnx ">Make your prediction</a>
+            </div>
+          </div>
+        </div>
+         <div class="jumbotron text-center" id="myJumbotron2" style="background-color:white">
+             <div class="container" id="Container2">
+               <div class="row">
+                  <div class="col-sm-12 text-center" id="PredictionsOutput">
+                  {% for pred in predictions %}
+                    <h4 class="stamp">The speaker of the audio file is: <strong  class="output">{{ pred }}</strong> </h4>
+                  {% endfor %}
+                  </div>
+               </div>
+             </div>
+         </div>
+         <div class="container">
+             <div class="center">
+              {% block content %}
+              {% endblock %}
+             </div>
+         </div>
+  </section>
+
+  <section class="right-sec">
+   <figure>
+   
+   </figure>
+  </section>
+ </main>
+</header>
+</body>
+</html>
