@@ -11,7 +11,7 @@ Download the dev-clean and dev-other folder from [here](http://www.openslr.org/r
 
 **Other important topics**
 
-The Keras model is stored in the `[model](https://github.com/parth58/Speaker_Recognizer/blob/master/Django-App(SpeakerIdentifier)/SpeakerIdentifier/SpeakerIdentifier)` folder.
+The Keras model is stored in the [model](https://github.com/parth58/Speaker_Recognizer/blob/master/Django-App(SpeakerIdentifier)/SpeakerIdentifier/SpeakerIdentifier) folder.
 
 `media` folder includes the audio files loaded using the server.
 
