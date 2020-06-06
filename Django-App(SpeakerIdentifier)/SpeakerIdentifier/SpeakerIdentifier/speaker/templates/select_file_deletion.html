@@ -5,10 +5,10 @@
     <form action="/speaker/delete/" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <h2>Click confirm below the filename you want to delete from the following list:</h2>
+        <h2>Click delete below the filename you want to delete from the server:</h2>
         {% for myfile, pk in filename %}
             <p> - {{ myfile }}</p>
-            <input type="submit" value="Confirm" class="btn btn-primary">
+            <input type="submit" value="Delete" class="btn btn-danger">
             <input type="hidden" name="pk" value="{{ pk }}">
             <br>
             <br>

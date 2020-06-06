@@ -3,17 +3,28 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.staticfiles.storage import staticfiles_storage
 from .apps import SpeakerConfig
 from django.conf import settings
-
+import io
 import os
 import tensorflow
 from tensorflow import keras
 from keras.models import load_model
 import pathlib
 from pathlib import Path
+import speech_recognition as sr
+import matplotlib.pyplot as plt
+from matplotlib import pylab
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
 import html
 
 import librosa
 import numpy as np
+import urllib
+import base64
 
 from speaker.serialize import FileSerializer
 from speaker.models import FileModel
@@ -298,6 +309,7 @@ class Predict(views.APIView):
         self.loaded_model = load_model(
             os.path.join(settings.MODEL_ROOT, model_name))
         self.predictions = []
+        self.graph = None
 
     def file_elaboration(self, filepath):
 
@@ -310,6 +322,8 @@ class Predict(views.APIView):
             training_data_expanded = training_data.reshape((1, 40))
             print(training_data)
             predicted_label = self.loaded_model.predict(training_data_expanded)
+            self.graph = self.getGraph(predicted_label)
+
             print(predicted_label.argmax())
 
             numpred = predicted_label.argmax()
@@ -323,8 +337,27 @@ class Predict(views.APIView):
         filename = request.POST.getlist('file_name').pop()
         filepath = str(os.path.join(settings.MEDIA_ROOT, filename))
         predictions = self.file_elaboration(filepath)
+        r = sr.Recognizer()
+        text = ''
+        joined_string = ''
+        with sr.AudioFile(filepath) as source:
+            audio_text = r.record(source)
+            try:
+                # using google speech recognition
+                text = r.recognize_google(audio_text)
+                print('Converting audio transcripts into text ...')
+                print(text)
+                word_tokens = word_tokenize(text)
+                stop_words = set(stopwords.words('english'))
+                filtered_sentence = [
+                    w for w in word_tokens if not w in stop_words]
+                # joined_string = ",".join(filtered_sentence)
+                joined_string = ", ".join(map(str, filtered_sentence))
+            except:
+                print('Sorry.. run again...')
+
         try:
-            return Response({'predictions': predictions.pop()}, status=status.HTTP_200_OK)
+            return Response({'predictions': predictions.pop(), 'transscript': text, 'main_words': joined_string, 'data': self.graph}, status=status.HTTP_200_OK)
         except ValueError as err:
             return Response(str(err), status=status.HTTP_400_BAD_REQUEST)
 
@@ -351,3 +384,42 @@ class Predict(views.APIView):
                             ' zinniz']
 
         return label_conversion[pred]
+
+    @staticmethod
+    def getGraph(sizes):
+        label_conversion = [' A. E. Maroney', ' Andrew NG', ' Anya', ' Arielle Lipshaw',
+                            ' Betty Chen', ' Bill Mosley', ' BookAngel7', ' Brendan Hodge',
+                            ' Brian von Dedenroth', ' Cata', ' Christie Nowak',
+                            ' David Mecionis', ' David Mix', ' Doug', ' E. Tavano', ' Hilara',
+                            ' Jean Bascom', ' Jeana Wei', ' Jennifer Wiginton',
+                            ' JenniferRutters', ' JenniferW', ' Jill Engle', ' John Rose',
+                            ' JudyGibson', ' Julie VW', ' JustinJYN', ' Kathy Caver',
+                            ' Lisa Meyers', ' M. Bertke', ' Malone', ' Mark Nelson',
+                            ' Mark Welch', ' Mary J', ' Michael Packard', ' Moromis',
+                            ' Nelly ()', ' Nicodemus', ' Peter Eastman', ' President Lethe',
+                            ' Ransom', ' Renata', ' Russ Clough', ' S R Colon',
+                            ' Scott Walter', ' Sharon Bautista', ' Simon Evers',
+                            ' Stephen Kinford', ' Steven Collins', ' Susan Hooks', ' Tonia',
+                            ' VOICEGUY', ' WangHaojie', ' Wayne Donovan', ' Wendy Belcher',
+                            ' Winston Tharp', ' aquielisunari', ' ashleyspence', ' badey',
+                            ' calystra', ' camelot2302', ' chocmuse', ' dexter', ' emmablob',
+                            ' fling93', ' iamartin', ' neelma', ' nprigoda', ' om123',
+                            ' ppezz', ' rohde', ' sid', ' spiritualbeing', ' thestorygirl',
+                            ' zinniz']
+        k, = np.where(sizes[0] <= 0.005)
+        print(k)
+
+        sizes = np.delete(sizes[0], k)
+        label_conversion = np.delete(label_conversion, k)
+        fig1, ax1 = plt.subplots()
+        ax1.pie(sizes, labels=label_conversion, autopct='%1.1f%%',
+                shadow=True, startangle=90)
+        ax1.axis('equal')
+        # g = mpld3.fig_to_html(fig)
+        buf = io.BytesIO()
+        fig1.savefig(buf, format="png")
+        buf.seek(0)
+        g = base64.b64encode(buf.read())
+        uri = urllib.parse.quote(g)
+
+        return uri
