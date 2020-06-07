@@ -357,7 +357,7 @@ class Predict(views.APIView):
                 print('Sorry.. run again...')
 
         try:
-            return Response({'predictions': predictions.pop(), 'transscript': text, 'main_words': joined_string, 'data': self.graph}, status=status.HTTP_200_OK)
+            return Response({'result': true, 'predictions': predictions.pop(), 'transscript': text, 'main_words': joined_string, 'data': self.graph}, status=status.HTTP_200_OK)
         except ValueError as err:
             return Response(str(err), status=status.HTTP_400_BAD_REQUEST)
 

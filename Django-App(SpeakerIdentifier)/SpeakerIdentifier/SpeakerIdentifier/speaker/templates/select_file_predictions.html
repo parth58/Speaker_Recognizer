@@ -4,11 +4,12 @@
     <form action="/speaker/predict/" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <h2>Please select the file</h2>
+        <h2 class="contact-title text-info">Please select the file</h2>
     
         {% for myfile in filename %}
         <div class="form-group">
-          <input type="checkbox" name="file_name" value="{{ myfile }}">
+        
+          <input   type="checkbox" name="file_name" value="{{ myfile }}">
             <label>
                 <a href="/media/{{ myfile }}">{{ myfile }}</a>
             </label>

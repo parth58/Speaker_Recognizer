@@ -5,13 +5,19 @@
     <form action="/speaker/delete/" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <h2>Click delete below the filename you want to delete from the server:</h2>
+        <h2 class="contact-title text-info">Click delete below the filename you want to delete from the server:</h2>
         {% for myfile, pk in filename %}
-            <p> - {{ myfile }}</p>
-            <input type="submit" value="Delete" class="btn btn-danger">
+      
+        <div class="input-form text-warning">
+        {{ myfile }}                           
+        </div>
+                            
+                           
+                                <input type="submit" value="Delete" class="genric-btn danger radius small">
             <input type="hidden" name="pk" value="{{ pk }}">
-            <br>
-            <br>
+                            
+                        
+        
         {% endfor %}
         <br>
     </form>
